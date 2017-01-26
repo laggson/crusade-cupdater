@@ -1,4 +1,5 @@
-﻿using Laggson.Common.Json;
+﻿using Laggson.Common;
+using Laggson.Common.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,15 +47,13 @@ namespace UpdaterWpf
         {
             InitializeComponent();
             _args = args;
-            this.Loaded += MainWindow_Loaded;
+            Loaded += MainWindow_Loaded;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Thread thread = new Thread(() => TrySetArgsAndExit(_args));
             thread.Start();
-
-            // TODO: neue exe starten.
         }
 
 
@@ -66,7 +65,7 @@ namespace UpdaterWpf
         {
             string workPath = Arguments[Args.Directory];
 
-            if (IsNewVersionAvailable())
+            if (UpdateHelper.IsNewVersionAvailable(Arguments[Args.Name], Arguments[Args.Version]))
             {
                 string tempPath = @"C:\Temp\LaggsonDatedZeugUp\";
 
@@ -176,21 +175,6 @@ namespace UpdaterWpf
             }
 
             Progress = 75;
-        }
-
-        /// <summary>
-        /// Überprüft die WebApi, ob eine neuere Version der Software verfügbar ist.
-        /// Löst eine Ausnahme aus, falls die Client-Version neuer ist.
-        /// </summary>
-        /// <returns>True, wenn eine neuer Version vorhanden ist. Sonst false</returns>
-        private bool IsNewVersionAvailable()
-        {
-            var cl = new WebClient();
-            var result = cl.DownloadString(API_URL + "version/" + Arguments[Args.Name]);
-            var newest = new Version(result);
-            var current = new Version(Arguments[Args.Version]);
-
-            return newest.IsLargerThan(current);
         }
 
         /// <summary>

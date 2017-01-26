@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using UpdaterWpf;
 
@@ -14,21 +11,15 @@ namespace Updater.Wpf
         static void Main(string[] args)
         {
             Application app = new Application();
+            app.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             app.Run(new MainWindow(args));
         }
-    }
-    
-    static class Extensions
-    {
-        public static bool IsLargerThan(this Version maybeLargerVer, Version otherVer)
+
+        private static void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            int compared = maybeLargerVer.CompareTo(otherVer);
-
-            if (compared == -1)
-                throw new ArgumentException("Du kannst doch keine neuere Version haben als der Server vallah.");
-
-            return compared == 1;
+            MessageBox.Show("Es ist eine Ausnahme vom Typ " + e.Exception.ToString() + " aufgetreten. Die Anwendung muss beendet werden."
+                + Environment.NewLine + "Zusätzliche Information: " + e.Exception.Message);
         }
     }
 }
